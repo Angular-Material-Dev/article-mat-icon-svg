@@ -1,0 +1,18 @@
+@use "@angular/material" as mat;
+
+@include mat.core();
+
+$mat-icon-svg-primary: mat.define-palette(mat.$indigo-palette);
+$mat-icon-svg-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+
+$mat-icon-svg-warn: mat.define-palette(mat.$red-palette);
+
+$mat-icon-svg-theme: mat.define-light-theme((color: (primary: $mat-icon-svg-primary,
+        accent: $mat-icon-svg-accent,
+        warn: $mat-icon-svg-warn,
+      ),
+      typography: mat.define-typography-config(),
+    ));
+
+@include mat.core-theme($mat-icon-svg-theme);
+@include mat.icon-theme($mat-icon-svg-theme);
