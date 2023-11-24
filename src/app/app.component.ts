@@ -1,6 +1,10 @@
-import { Component } from '@angular/core';
+import { Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { MatIconModule, MatIconRegistry } from "@angular/material/icon";
+import {
+  IconResolver,
+  MatIconModule,
+  MatIconRegistry,
+} from "@angular/material/icon";
 import { DomSanitizer } from "@angular/platform-browser";
 
 const THUMBUP_ICON =
@@ -19,25 +23,42 @@ const THUMBUP_ICON =
   imports: [CommonModule, MatIconModule],
   template: `
     <div class="container">
-      <h2>Font Icon</h2>
-      <mat-icon
-        aria-hidden="false"
-        aria-label="Example home icon"
-        fontIcon="home"
-      ></mat-icon>
-      <h2>String literal of SVG icon</h2>
-      <mat-icon
-        svgIcon="thumbs-up"
-        aria-hidden="false"
-        aria-label="Example thumbs up SVG icon"
-      ></mat-icon>
-      <h2>Icon from single SVG file</h2>
+      <h2>addSvgIcon</h2>
       <mat-icon
         svgIcon="face"
         aria-hidden="false"
         aria-label="Example face SVG icon"
       ></mat-icon>
-      <h2>Multiple icons from SVG sprite file</h2>
+      <h2>addSvgIconInNamespace</h2>
+      <mat-icon
+        svgIcon="app:face"
+        aria-hidden="false"
+        aria-label="Example face SVG icon"
+      ></mat-icon>
+      <h2>addSvgIconLiteral</h2>
+      <mat-icon
+        svgIcon="thumbs-up"
+        aria-hidden="false"
+        aria-label="Example thumbs-up SVG icon"
+      ></mat-icon>
+      <h2>addSvgIconLiteralInNamespace</h2>
+      <mat-icon
+        svgIcon="app:thumbs-up"
+        aria-hidden="false"
+        aria-label="Example thumbs-up SVG icon"
+      ></mat-icon>
+      <h2>addSvgIconResolver</h2>
+      <mat-icon
+        svgIcon="done"
+        aria-hidden="false"
+        aria-label="Example done SVG icon"
+      ></mat-icon>
+      <mat-icon
+        svgIcon="favorite"
+        aria-hidden="false"
+        aria-label="Example favorite SVG icon"
+      ></mat-icon>
+      <h2>addSvgIconSet</h2>
       <mat-icon
         svgIcon="search"
         aria-hidden="false"
@@ -60,14 +81,39 @@ const THUMBUP_ICON =
 })
 export class AppComponent {
   constructor(iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
+    // addSvgIcon
+    iconRegistry.addSvgIcon(
+      "face",
+      sanitizer.bypassSecurityTrustResourceUrl("/assets/single-icon/face.svg")
+    );
+    iconRegistry.addSvgIconInNamespace(
+      "app",
+      "face",
+      sanitizer.bypassSecurityTrustResourceUrl("/assets/single-icon/face.svg")
+    );
+
+    // addSvgIconLiteral
     iconRegistry.addSvgIconLiteral(
       "thumbs-up",
       sanitizer.bypassSecurityTrustHtml(THUMBUP_ICON)
     );
-    iconRegistry.addSvgIcon(
-      "face",
-      sanitizer.bypassSecurityTrustResourceUrl("/assets/icons/face.svg")
+    iconRegistry.addSvgIconLiteralInNamespace(
+      "app",
+      "thumbs-up",
+      sanitizer.bypassSecurityTrustHtml(THUMBUP_ICON)
     );
+
+    // addSvgIconResolver
+    const resolver: IconResolver = (name) =>
+      // for this demo, excluding settings and search
+      // they need to be loaded from addSvgIconSet
+      !["settings", "search"].includes(name) &&
+      sanitizer.bypassSecurityTrustResourceUrl(`/assets/icons/${name}.svg`);
+    iconRegistry.addSvgIconResolver(resolver);
+
+    // addSvgIconSet
+    // We con also load in default namespace, but as we have used resolver,
+    // it will cause issue, hence using  addSvgIconSetInNamespace
     iconRegistry.addSvgIconSet(
       sanitizer.bypassSecurityTrustResourceUrl("/assets/icons-sprite.svg")
     );
